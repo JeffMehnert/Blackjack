@@ -36,6 +36,7 @@ namespace Blackjack
         public void emptyHand()
         {
             hand.Clear();
+            busted = false;
         }
 
         public void getHand()
@@ -55,9 +56,15 @@ namespace Blackjack
                     aceCount++;
             }
 
-            for (int i = 0; i < aceCount; i++)
-                val -= 10;
+            if(val > 21 && aceCount > 0)
+            {
+                for (int i = 0; i < aceCount; i++)
+                    val -= 10;
+            }
 
+            if (val > 21)
+                busted = true;
+            
             return val;
         }
     }

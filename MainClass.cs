@@ -73,6 +73,8 @@ namespace Blackjack
                     {
                         if (p.getHandVal() > dealer.getHandVal() && p.busted == false)
                             Console.WriteLine("{0} wins!", p.name);
+                        else if (p.getHandVal() == dealer.getHandVal() && p.busted == false)
+                            Console.WriteLine("{0} pushes", p.name);
                         else
                             Console.WriteLine("Dealer wins over {0}!", p.name);
                     }
@@ -172,8 +174,6 @@ namespace Blackjack
                 Console.WriteLine("Dealer draws {0}", drawnCard.id);
                 d.draw(drawnCard);
                 dealerHandVal = d.getHandVal();
-                if (dealerHandVal > 21)
-                    d.busted = true;
                 Console.WriteLine("Dealer hand value: {0}", dealerHandVal.ToString());
             }
         }
