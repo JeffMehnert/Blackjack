@@ -1,4 +1,9 @@
-﻿using System;
+﻿/*
+Made by Jeff Mehnert
+Personal Project
+March 2016
+*/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +18,7 @@ namespace Blackjack
 
         public static void Main()
         {
-
+            Console.WriteLine("Welcome to Jeff's blackjack!");
             Console.WriteLine("How many decks would you like to play with?");
             int deckCount = Convert.ToInt32(Console.ReadLine());
             deck = new Deck(deckCount);
@@ -29,50 +34,70 @@ namespace Blackjack
             players = new List<Player>();
             for (int i = 0; i < playerCount; i++)
             {
-                Player player = new Player("Player " + (i+1).ToString());
+                Player player = new Player("Player " + (i + 1).ToString());
                 players.Add(player);
             }
             Dealer dealer = new Dealer();
-
-            dealTable(); //deal players first card
-            dealer.draw(drawCard()); //deal dealer first card
-            dealTable(); //deal players second card
-            dealer.draw(drawCard()); //deal dealer second card
-
-            foreach (Player p in players) //print out player hands
-                p.getHand();
-
-            Console.WriteLine();
-
-            dealer.getTopCard(); //print out dealer top card
-            Console.WriteLine();
-            foreach (Player p in players) //play hands
-                playHand(p);
-
-            playDealerHand(dealer);
-            if(dealer.busted == true)
+            bool done = false;
+            do
             {
-                Console.WriteLine("Dealer busts!");
+                dealTable(); //deal players first card
+                dealer.draw(drawCard()); //deal dealer first card
+                dealTable(); //deal players second card
+                dealer.draw(drawCard()); //deal dealer second card
+
+                foreach (Player p in players) //print out player hands
+                    p.getHand();
+
                 Console.WriteLine();
-                foreach(Player p in players)
+
+                dealer.getTopCard(); //print out dealer top card
+                Console.WriteLine();
+                foreach (Player p in players) //play hands
+                    playHand(p);
+
+                playDealerHand(dealer);
+                if (dealer.busted == true)
                 {
-                    if(p.busted == false)
-                        Console.WriteLine("{0} wins!", p.name);
+                    Console.WriteLine("Dealer busts!");
+                    Console.WriteLine();
+                    foreach (Player p in players)
+                    {
+                        if (p.busted == false)
+                            Console.WriteLine("{0} wins!", p.name);
+                    }
                 }
-            }
-            else
-            {
-                 foreach(Player p in players)
-                 {
-                     if (p.getHandVal() > dealer.getHandVal() && p.busted == false)
-                         Console.WriteLine("{0} wins!", p.name);
-                     else
-                         Console.WriteLine("Dealer wins over {0}!", p.name);
-                 }
-            }
-               
-           
-            Console.WriteLine("You played with {0} decks, {1} cards left in the deck", deckCount, deck.cards.Count);
+                else
+                {
+                    foreach (Player p in players)
+                    {
+                        if (p.getHandVal() > dealer.getHandVal() && p.busted == false)
+                            Console.WriteLine("{0} wins!", p.name);
+                        else
+                            Console.WriteLine("Dealer wins over {0}!", p.name);
+                    }
+                }
+
+                if (deck.cards.Count < (8*players.Count))
+                {
+                    Console.WriteLine("Deck is running low on cards, it only has {0} cards left. Exiting...", deck.cards.Count.ToString());
+                    done = true;
+                    break;
+                }
+
+
+                Console.WriteLine("You played with {0} decks, {1} cards left in the deck", deckCount, deck.cards.Count);
+                Console.WriteLine("Would you like to play another hand? 1 for yes, 0 for no");
+                int input = Convert.ToInt32(Console.ReadLine());
+                if (input == 0)
+                    done = true;
+
+                foreach (Player p in players)
+                    p.emptyHand();
+
+                dealer.emptyHand();
+            } while (done == false);
+            Console.WriteLine("Thanks for playing! Press any key to exit. Made by jeffymeh");
             Console.ReadKey();
         }
 
@@ -122,7 +147,7 @@ namespace Blackjack
                     Console.WriteLine("{0} has busted", p.name);
                     p.busted = true;
                 }
-                   
+
 
             } while (stand == false && hasBusted == false);
         }

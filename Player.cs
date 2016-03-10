@@ -1,4 +1,9 @@
-﻿using System;
+﻿/*
+Made by Jeff Mehnert
+Personal Project
+March 2016
+*/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,9 +41,9 @@ namespace Blackjack
             hand.Add(c);
         }
 
-        public void stand()
+        public void emptyHand()
         {
-
+            hand.Clear();
         }
         
         public void getHand()

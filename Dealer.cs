@@ -1,4 +1,9 @@
-﻿using System;
+﻿/*
+Made by Jeff Mehnert
+Personal Project
+March 2016
+*/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,6 +31,11 @@ namespace Blackjack
         {
             Console.WriteLine("Dealer shows:");
             Console.WriteLine("{0} of {1}",hand[hand.Count - 1].id, hand[hand.Count - 1].suit);
+        }
+
+        public void emptyHand()
+        {
+            hand.Clear();
         }
 
         public void getHand()
