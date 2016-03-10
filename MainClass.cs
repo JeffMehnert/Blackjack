@@ -5,10 +5,7 @@ March 2016
 */
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Blackjack
 {
@@ -32,7 +29,7 @@ namespace Blackjack
 
             Console.WriteLine("How many players?");
             int playerCount = Convert.ToInt32(Console.ReadLine()); //amount of players
-            if(playerCount < 1) //more error handling
+            if (playerCount < 1) //more error handling
             {
                 Console.WriteLine("Please, sit at least one player at the table");
                 Console.ReadKey();
@@ -52,11 +49,12 @@ namespace Blackjack
                 dealer.draw(drawCard()); //deal dealer first card
                 dealTable(); //deal players second card
                 dealer.draw(drawCard()); //deal dealer second card
+                Console.WriteLine();
 
                 foreach (Player p in players) //print out player hands
                 {
                     p.getHand();
-                    if(p.getHandVal() == 21)
+                    if (p.getHandVal() == 21)
                     {
                         Console.WriteLine("{0} has blackjack!", p.name);
                         p.blackjack = true;
@@ -65,12 +63,12 @@ namespace Blackjack
                 Console.WriteLine();
                 dealer.getTopCard(); //print out dealer top card
                 Console.WriteLine();
-                
-                if(dealer.getHandVal() == 21) //check if dealer has blackjack
+
+                if (dealer.getHandVal() == 21) //check if dealer has blackjack
                 {
                     Console.WriteLine("Dealer has blackjack!");
                     dealer.blackjack = true;
-                    foreach(Player p in players)
+                    foreach (Player p in players)
                     {
                         if (p.blackjack == false)
                             Console.WriteLine("Dealer wins over {0}", p.name);
@@ -86,7 +84,7 @@ namespace Blackjack
                         playHand(p);
 
                     playDealerHand(dealer);
-                    if (dealer.busted == true)
+                    if (dealer.busted == true) //if dealer busts
                     {
                         Console.WriteLine("Dealer busts!");
                         Console.WriteLine();
@@ -96,21 +94,21 @@ namespace Blackjack
                                 Console.WriteLine("{0} wins!", p.name);
                         }
                     }
-                    else
+                    else //if dealer doesn't bust
                     {
                         foreach (Player p in players)
                         {
-                            if (p.getHandVal() > dealer.getHandVal() && p.busted == false)
+                            if (p.getHandVal() > dealer.getHandVal() && p.busted == false) //if player has higher value without being busted
                                 Console.WriteLine("{0} wins!", p.name);
-                            else if (p.getHandVal() == dealer.getHandVal() && p.busted == false)
+                            else if (p.getHandVal() == dealer.getHandVal() && p.busted == false) //if a push
                                 Console.WriteLine("{0} pushes", p.name);
-                            else
+                            else //if dealer has higher than player or player busted
                                 Console.WriteLine("Dealer wins over {0}!", p.name);
                         }
                     }
                 }
 
-                if (deck.cards.Count < (8*players.Count))
+                if (deck.cards.Count < (8 * players.Count)) //stops the game when the amount of cards left in the deck is less than 8 times the number of players
                 {
                     Console.WriteLine("Deck is running low on cards, it only has {0} cards left. Exiting...", deck.cards.Count.ToString());
                     done = true;
@@ -121,10 +119,10 @@ namespace Blackjack
                 Console.WriteLine("You played with {0} decks, {1} cards left in the deck", deckCount, deck.cards.Count);
                 Console.WriteLine("Would you like to play another hand? 1 for yes, 0 for no");
                 int input = Convert.ToInt32(Console.ReadLine());
-                if (input == 0)
+                if (input == 0) //done playing
                     done = true;
 
-                foreach (Player p in players)
+                foreach (Player p in players) //empty hands
                     p.emptyHand();
 
                 dealer.emptyHand();
@@ -133,14 +131,14 @@ namespace Blackjack
             Console.ReadKey();
         }
 
-        public static Card drawCard()
+        public static Card drawCard() //removes a card off the last index of the deck and returns it
         {
             Card card = deck.cards[deck.cards.Count - 1];
             deck.cards.RemoveAt(deck.cards.Count - 1);
             return card;
         }
 
-        public static void dealTable()
+        public static void dealTable() //deals one card to each player at the table
         {
             foreach (Player p in players)
             {
@@ -148,8 +146,9 @@ namespace Blackjack
             }
         }
 
-        public static void playHand(Player p)
+        public static void playHand(Player p) //plays a hand for a player starting with the two cards dealt
         {
+            Console.WriteLine("{0}'s turn", p.name);
             p.getHand();
             int valOfHand = p.getHandVal();
             Console.WriteLine("Value of hand: {0}", valOfHand.ToString());
@@ -166,7 +165,7 @@ namespace Blackjack
                         p.hit(drawCard());
                         Console.WriteLine("You receive a {0}", p.hand[p.hand.Count - 1].id);
                         Console.WriteLine("Value of hand: {0}", p.getHandVal().ToString());
-                        if (p.getHandVal() == 21)
+                        if (p.getHandVal() == 21) //auto stand on 21 by breaking from the loop
                             break;
                     }
                     else if (input == "0")
@@ -185,13 +184,13 @@ namespace Blackjack
                     }
 
 
-                } while (stand == false && hasBusted == false);
+                } while (stand == false && hasBusted == false); //breaks when player stands or busts
             }
             else
                 Console.WriteLine("{0} won with blackjack!", p.name);
         }
 
-        public static bool bustedHand(Player p)
+        public static bool bustedHand(Player p) //returns true if a hand is a bust
         {
             if (p.getHandVal() > 21)
                 return true;
@@ -199,15 +198,15 @@ namespace Blackjack
                 return false;
         }
 
-        public static void playDealerHand(Dealer d)
+        public static void playDealerHand(Dealer d) //executes the dealer playing their cards
         {
             Console.WriteLine("Dealer's hand: ");
             d.getHand();
             int dealerHandVal = d.getHandVal();
             Console.WriteLine("Dealer hand value: {0}", dealerHandVal.ToString());
-            while (dealerHandVal < 17)
+            while (dealerHandVal < 17) //dealer must draw until the value of his hand is at least 17
             {
-                Thread.Sleep(2000);
+                Thread.Sleep(2000); //pause for 2 seconds while dealer takes a card (helps visualize the game in the console view)
                 Card drawnCard = drawCard();
                 Console.WriteLine("Dealer draws {0}", drawnCard.id);
                 d.draw(drawnCard);
