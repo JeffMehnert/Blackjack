@@ -15,11 +15,13 @@ namespace Blackjack
     {
         public List<Card> hand;
         public bool busted;
+        public bool blackjack;
 
         public Dealer()
         {
             hand = new List<Card>();
             busted = false;
+            blackjack = false;
         }
 
         public void draw(Card c)
@@ -37,6 +39,7 @@ namespace Blackjack
         {
             hand.Clear();
             busted = false;
+            blackjack = false;
         }
 
         public void getHand()

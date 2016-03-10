@@ -15,25 +15,15 @@ namespace Blackjack
     {
         public string name;
         public List<Card> hand;
-        public bool hasAce;
         public bool busted;
-        public int rawHandValue;
+        public bool blackjack;
         
-        public Player()
-        {
-            name = "";
-            hand = new List<Card>();
-            hasAce = false;
-            busted = false;
-            rawHandValue = 0;
-        }
         public Player(string name)
         {
             this.name = name;
             hand = new List<Card>();
-            hasAce = false;
             busted = false;
-            rawHandValue = 0;
+            blackjack = false;
         }
 
         public void hit(Card c)
@@ -45,16 +35,15 @@ namespace Blackjack
         {
             hand.Clear();
             busted = false;
+            blackjack = false;
         }
         
         public void getHand()
         {
             Console.WriteLine("{0} has:", name);
             foreach(Card c in hand)
-            {
-                rawHandValue += c.value;
                 Console.WriteLine("{0} of {1}", c.id, c.suit);
-            }
+
             Console.WriteLine();    
         }
 
@@ -68,13 +57,12 @@ namespace Blackjack
                 if (c.id == "A")
                     aceCount++;
             }
-            
+
             if (val > 21 && aceCount >= 1)
             {
                 for (int i = 0; i < aceCount; i++)
                     val -= 10;
             }
-
             return val;
         }
     }

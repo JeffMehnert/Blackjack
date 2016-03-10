@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Blackjack
@@ -20,9 +21,9 @@ namespace Blackjack
         {
             Console.WriteLine("Welcome to Jeff's blackjack!");
             Console.WriteLine("How many decks would you like to play with?");
-            int deckCount = Convert.ToInt32(Console.ReadLine());
+            int deckCount = Convert.ToInt32(Console.ReadLine()); //amount of decks (2 deck, 6 deck, etc)
             deck = new Deck(deckCount);
-            if (deckCount < 1)
+            if (deckCount < 1) //a little error handling
             {
                 Console.WriteLine("Enter at least one deck");
                 Console.ReadKey();
@@ -30,9 +31,15 @@ namespace Blackjack
             }
 
             Console.WriteLine("How many players?");
-            int playerCount = Convert.ToInt32(Console.ReadLine());
+            int playerCount = Convert.ToInt32(Console.ReadLine()); //amount of players
+            if(playerCount < 1) //more error handling
+            {
+                Console.WriteLine("Please, sit at least one player at the table");
+                Console.ReadKey();
+                return;
+            }
             players = new List<Player>();
-            for (int i = 0; i < playerCount; i++)
+            for (int i = 0; i < playerCount; i++)//create players, give them names in the form of Player 1, Player 2, ...
             {
                 Player player = new Player("Player " + (i + 1).ToString());
                 players.Add(player);
@@ -47,36 +54,59 @@ namespace Blackjack
                 dealer.draw(drawCard()); //deal dealer second card
 
                 foreach (Player p in players) //print out player hands
-                    p.getHand();
-
-                Console.WriteLine();
-
-                dealer.getTopCard(); //print out dealer top card
-                Console.WriteLine();
-                foreach (Player p in players) //play hands
-                    playHand(p);
-
-                playDealerHand(dealer);
-                if (dealer.busted == true)
                 {
-                    Console.WriteLine("Dealer busts!");
-                    Console.WriteLine();
-                    foreach (Player p in players)
+                    p.getHand();
+                    if(p.getHandVal() == 21)
                     {
-                        if (p.busted == false)
-                            Console.WriteLine("{0} wins!", p.name);
+                        Console.WriteLine("{0} has blackjack!", p.name);
+                        p.blackjack = true;
                     }
                 }
-                else
+                Console.WriteLine();
+                dealer.getTopCard(); //print out dealer top card
+                Console.WriteLine();
+                
+                if(dealer.getHandVal() == 21) //check if dealer has blackjack
                 {
-                    foreach (Player p in players)
+                    Console.WriteLine("Dealer has blackjack!");
+                    dealer.blackjack = true;
+                    foreach(Player p in players)
                     {
-                        if (p.getHandVal() > dealer.getHandVal() && p.busted == false)
-                            Console.WriteLine("{0} wins!", p.name);
-                        else if (p.getHandVal() == dealer.getHandVal() && p.busted == false)
-                            Console.WriteLine("{0} pushes", p.name);
+                        if (p.blackjack == false)
+                            Console.WriteLine("Dealer wins over {0}", p.name);
                         else
-                            Console.WriteLine("Dealer wins over {0}!", p.name);
+                            Console.WriteLine("{0} pushes", p.name);
+
+                    }
+                }
+                else //play the hand out if dealer doesn't have blackjack
+                {
+
+                    foreach (Player p in players) //play hands
+                        playHand(p);
+
+                    playDealerHand(dealer);
+                    if (dealer.busted == true)
+                    {
+                        Console.WriteLine("Dealer busts!");
+                        Console.WriteLine();
+                        foreach (Player p in players)
+                        {
+                            if (p.busted == false)
+                                Console.WriteLine("{0} wins!", p.name);
+                        }
+                    }
+                    else
+                    {
+                        foreach (Player p in players)
+                        {
+                            if (p.getHandVal() > dealer.getHandVal() && p.busted == false)
+                                Console.WriteLine("{0} wins!", p.name);
+                            else if (p.getHandVal() == dealer.getHandVal() && p.busted == false)
+                                Console.WriteLine("{0} pushes", p.name);
+                            else
+                                Console.WriteLine("Dealer wins over {0}!", p.name);
+                        }
                     }
                 }
 
@@ -125,33 +155,40 @@ namespace Blackjack
             Console.WriteLine("Value of hand: {0}", valOfHand.ToString());
             bool stand = false;
             bool hasBusted = false;
-            do
+            if (p.blackjack == false)
             {
-                Console.WriteLine("1 for hit, 0 for stand");
-                string input = Console.ReadLine();
-                if (input == "1")
+                do
                 {
-                    p.hit(drawCard());
-                    Console.WriteLine("You receive a {0}", p.hand[p.hand.Count - 1].id);
-                    Console.WriteLine("Value of hand: {0}", p.getHandVal().ToString());
-                }
-                else if (input == "0")
-                {
-                    stand = true;
-                    Console.WriteLine("{0} stood at {1}", p.name, p.getHandVal().ToString());
-                    Console.WriteLine();
-                }
+                    Console.WriteLine("1 for hit, 0 for stand");
+                    string input = Console.ReadLine();
+                    if (input == "1")
+                    {
+                        p.hit(drawCard());
+                        Console.WriteLine("You receive a {0}", p.hand[p.hand.Count - 1].id);
+                        Console.WriteLine("Value of hand: {0}", p.getHandVal().ToString());
+                        if (p.getHandVal() == 21)
+                            break;
+                    }
+                    else if (input == "0")
+                    {
+                        stand = true;
+                        Console.WriteLine("{0} stood at {1}", p.name, p.getHandVal().ToString());
+                        Console.WriteLine();
+                    }
 
 
-                hasBusted = bustedHand(p);
-                if (hasBusted)
-                {
-                    Console.WriteLine("{0} has busted", p.name);
-                    p.busted = true;
-                }
+                    hasBusted = bustedHand(p);
+                    if (hasBusted)
+                    {
+                        Console.WriteLine("{0} has busted", p.name);
+                        p.busted = true;
+                    }
 
 
-            } while (stand == false && hasBusted == false);
+                } while (stand == false && hasBusted == false);
+            }
+            else
+                Console.WriteLine("{0} won with blackjack!", p.name);
         }
 
         public static bool bustedHand(Player p)
@@ -170,6 +207,7 @@ namespace Blackjack
             Console.WriteLine("Dealer hand value: {0}", dealerHandVal.ToString());
             while (dealerHandVal < 17)
             {
+                Thread.Sleep(2000);
                 Card drawnCard = drawCard();
                 Console.WriteLine("Dealer draws {0}", drawnCard.id);
                 d.draw(drawnCard);
