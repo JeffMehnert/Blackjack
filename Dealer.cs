@@ -26,10 +26,12 @@ namespace Blackjack
             hand.Add(c);
         }
 
-        public void getTopCard() //prints top card in dealer's hand (showing his top card, hiding his bottom card)
+        public Card getTopCard() //prints top card in dealer's hand (showing his top card, hiding his bottom card)
         {
             Console.WriteLine("Dealer shows:");
-            Console.WriteLine("{0} of {1}", hand[hand.Count - 1].id, hand[hand.Count - 1].suit);
+            Card topCard = hand[hand.Count - 1];
+            Console.WriteLine("{0} of {1}", topCard.id, topCard.suit);
+            return topCard;
         }
 
         public void emptyHand() //prepares hand for next round

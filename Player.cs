@@ -14,6 +14,8 @@ namespace Blackjack
         public List<Card> hand; //player's hand
         public bool busted;
         public bool blackjack;
+        public double bank;
+        public int bet;
 
         public Player(string name) //constructor
         {
@@ -21,7 +23,68 @@ namespace Blackjack
             hand = new List<Card>();
             busted = false;
             blackjack = false;
+            bank = 0;
+            bet = 0;
         }
+
+        public void addMoney()
+        {
+            Console.WriteLine("{0}, how much money would you like to play with?", name);
+            double money = Convert.ToDouble(Console.ReadLine());
+            bank += money;
+            Console.WriteLine();
+        }
+
+
+        public void placeBet() //place bets. makes the user enter a valid bet
+        {
+            bool success = false;
+            Console.WriteLine("{0}, please place your bet. You have ${1} left in your bank", name, bank.ToString("F"));
+            do{
+                int bet = Convert.ToInt32(Console.ReadLine());
+                if (bet <= 0)
+                    Console.WriteLine("Enter a bet greater than 0");
+                else if (bank < bet)
+                    Console.WriteLine("Bet exceeds amount in the bank. Enter a smaller bet");
+                else
+                {
+                    this.bet = bet;
+                    bank -= bet;
+                    success = true;
+                }
+                    
+            }while(success == false);
+            Console.WriteLine();
+        }
+
+        public void payout() //pays player on a win
+        {
+            const double THREEHALVES = 3 / 2;
+            if (blackjack == true)      //if player won with blackjack, pay 3 to 2
+                bank += bet * THREEHALVES;
+            else                        //if not, pay 2 to 1
+                bank += bet * 2;
+        }
+
+        public void insurance()
+        {
+            Console.WriteLine("Dealer is showing an A. {0}, would you like to buy insurance? 1 for yes, 0 for no.");
+            bool success = false;
+            int input;
+            do
+            {
+                input = Convert.ToInt32(Console.ReadLine());
+                if (input == 0 || input == 1)
+                    success = true;
+            } while (success == false);
+            if (input == 1)
+            {
+
+            }
+            else
+                return;
+        }
+
 
         public void hit(Card c) //hit me! add one card to player's hand
         {
@@ -33,6 +96,7 @@ namespace Blackjack
             hand.Clear();
             busted = false;
             blackjack = false;
+            bet = 0;
         }
 
         public void getHand() //prints hand's contents

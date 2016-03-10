@@ -42,9 +42,16 @@ namespace Blackjack
                 players.Add(player);
             }
             Dealer dealer = new Dealer();
+
+            foreach (Player p in players)
+                p.addMoney();
+            
             bool done = false;
             do
             {
+                foreach (Player p in players) //each player places bets
+                    p.placeBet();
+
                 dealTable(); //deal players first card
                 dealer.draw(drawCard()); //deal dealer first card
                 dealTable(); //deal players second card
@@ -61,7 +68,14 @@ namespace Blackjack
                     }
                 }
                 Console.WriteLine();
-                dealer.getTopCard(); //print out dealer top card
+                
+                Card dealerTopCard = dealer.getTopCard(); //print out dealer top card              
+                /*if(dealerTopCard.id == "A") //if dealer shows ace, offer insurance
+                {
+                    foreach (Player p in players)
+                        p.insurance();
+                }
+            */
                 Console.WriteLine();
 
                 if (dealer.getHandVal() == 21) //check if dealer has blackjack
@@ -92,20 +106,34 @@ namespace Blackjack
                         {
                             if (p.busted == false)
                                 Console.WriteLine("{0} wins!", p.name);
+
+                            Console.WriteLine("{0} now has ${1} in their bank.", p.name, p.bank.ToString("F"));
+
                         }
                     }
                     else //if dealer doesn't bust
                     {
                         foreach (Player p in players)
                         {
-                            if (p.getHandVal() > dealer.getHandVal() && p.busted == false) //if player has higher value without being busted
+                            if (p.getHandVal() > dealer.getHandVal() && p.busted == false) //if player wins
+                            {
                                 Console.WriteLine("{0} wins!", p.name);
-                            else if (p.getHandVal() == dealer.getHandVal() && p.busted == false) //if a push
+                                p.payout();
+                            }
+                                
+                            else if (p.getHandVal() == dealer.getHandVal() && p.busted == false) //if a push, they get their bet back
+                            {
                                 Console.WriteLine("{0} pushes", p.name);
-                            else //if dealer has higher than player or player busted
+                                p.bank += p.bet;
+                            }
+                               
+                            else //if dealer wins, player loses bet, which happens in emptyHand() function
                                 Console.WriteLine("Dealer wins over {0}!", p.name);
+
+                            Console.WriteLine("{0} now has ${1} in their bank.", p.name, p.bank.ToString("F"));
                         }
                     }
+                     
                 }
 
                 if (deck.cards.Count < (8 * players.Count)) //stops the game when the amount of cards left in the deck is less than 8 times the number of players
