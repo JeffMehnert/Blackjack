@@ -11,13 +11,15 @@ namespace Blackjack
         public string name;
         public List<Card> hand;
         public bool hasAce;
-        int rawHandValue;
+        public bool busted;
+        public int rawHandValue;
         
         public Player()
         {
             name = "";
             hand = new List<Card>();
             hasAce = false;
+            busted = false;
             rawHandValue = 0;
         }
         public Player(string name)
@@ -25,6 +27,7 @@ namespace Blackjack
             this.name = name;
             hand = new List<Card>();
             hasAce = false;
+            busted = false;
             rawHandValue = 0;
         }
 
@@ -46,29 +49,24 @@ namespace Blackjack
                 rawHandValue += c.value;
                 Console.WriteLine("{0} of {1}", c.id, c.suit);
             }
-                
+            Console.WriteLine();    
         }
 
-        public int valueOfHand()
+        public int getHandVal()
         {
             int val = 0;
-            foreach(Card c in hand)
-            {
-                if (c.id == "A")
-                    hasAce = true;
-            }
+            int aceCount = 0;
             foreach (Card c in hand)
-                val += c.value;
-
-            if (hasAce == false)
-                return val;
-            else if (rawHandValue > 21)
             {
-                val -= 10;
-                return val;
+                val += c.value;
+                if (c.id == "A")
+                    aceCount++;
             }
-            else
-                return val;
+
+            for (int i = 0; i < aceCount; i++)
+                val -= 10;
+
+            return val;
         }
     }
 }

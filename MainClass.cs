@@ -35,9 +35,9 @@ namespace Blackjack
             Dealer dealer = new Dealer();
 
             dealTable(); //deal players first card
-            dealer.addCard(drawCard()); //deal dealer first card
+            dealer.draw(drawCard()); //deal dealer first card
             dealTable(); //deal players second card
-            dealer.addCard(drawCard()); //deal dealer second card
+            dealer.draw(drawCard()); //deal dealer second card
 
             foreach (Player p in players) //print out player hands
                 p.getHand();
@@ -49,7 +49,29 @@ namespace Blackjack
             foreach (Player p in players) //play hands
                 playHand(p);
 
-            playDealerHand();
+            playDealerHand(dealer);
+            if(dealer.busted == true)
+            {
+                Console.WriteLine("Dealer busts!");
+                Console.WriteLine();
+                foreach(Player p in players)
+                {
+                    if(p.busted == false)
+                        Console.WriteLine("{0} wins!", p.name);
+                }
+            }
+            else
+            {
+                 foreach(Player p in players)
+                 {
+                     if (p.getHandVal() > dealer.getHandVal() && p.busted == false)
+                         Console.WriteLine("{0} wins!", p.name);
+                     else
+                         Console.WriteLine("Dealer wins over {0}!", p.name);
+                 }
+            }
+               
+           
             Console.WriteLine("You played with {0} decks, {1} cards left in the deck", deckCount, deck.cards.Count);
             Console.ReadKey();
         }
@@ -72,7 +94,7 @@ namespace Blackjack
         public static void playHand(Player p)
         {
             p.getHand();
-            int valOfHand = p.valueOfHand();
+            int valOfHand = p.getHandVal();
             Console.WriteLine("Value of hand: {0}", valOfHand.ToString());
             bool stand = false;
             bool hasBusted = false;
@@ -80,31 +102,55 @@ namespace Blackjack
             {
                 Console.WriteLine("1 for hit, 0 for stand");
                 string input = Console.ReadLine();
-                if(input == "1")
+                if (input == "1")
                 {
                     p.hit(drawCard());
+                    Console.WriteLine("You receive a {0}", p.hand[p.hand.Count - 1].id);
+                    Console.WriteLine("Value of hand: {0}", p.getHandVal().ToString());
                 }
-                else if(input == "0")
+                else if (input == "0")
+                {
                     stand = true;
+                    Console.WriteLine("{0} stood at {1}", p.name, p.getHandVal().ToString());
+                    Console.WriteLine();
+                }
+
 
                 hasBusted = bustedHand(p);
                 if (hasBusted)
+                {
                     Console.WriteLine("{0} has busted", p.name);
-                
+                    p.busted = true;
+                }
+                   
+
             } while (stand == false && hasBusted == false);
         }
 
         public static bool bustedHand(Player p)
         {
-            if (p.valueOfHand() > 21)
+            if (p.getHandVal() > 21)
                 return true;
             else
                 return false;
         }
 
-        public static void playDealerHand()
+        public static void playDealerHand(Dealer d)
         {
-
+            Console.WriteLine("Dealer's hand: ");
+            d.getHand();
+            int dealerHandVal = d.getHandVal();
+            Console.WriteLine("Dealer hand value: {0}", dealerHandVal.ToString());
+            while (dealerHandVal < 17)
+            {
+                Card drawnCard = drawCard();
+                Console.WriteLine("Dealer draws {0}", drawnCard.id);
+                d.draw(drawnCard);
+                dealerHandVal = d.getHandVal();
+                if (dealerHandVal > 21)
+                    d.busted = true;
+                Console.WriteLine("Dealer hand value: {0}", dealerHandVal.ToString());
+            }
         }
     }
 }
