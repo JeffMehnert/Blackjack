@@ -5,6 +5,7 @@ March 2016
 */
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Blackjack
 {
@@ -61,16 +62,15 @@ namespace Blackjack
 
         public void payout() //pays player on a win
         {
-            const double THREEHALVES = 3 / 2;
             if (blackjack == true)      //if player won with blackjack, pay 3 to 2
-                bank += bet * THREEHALVES;
+                bank += bet * 2.5;
             else                        //if not, pay 2 to 1
                 bank += bet * 2;
         }
 
         public void insurance() //when dealer shows an A, player has option to take insurance
         {
-            Console.WriteLine("Dealer is showing an A. {0}, would you like to buy insurance? 1 for yes, 0 for no.");
+            Console.WriteLine("Dealer is showing an A. {0}, would you like to buy insurance? 1 for yes, 0 for no.", name);
             bool success = false;
             int input;
             do
@@ -89,7 +89,7 @@ namespace Blackjack
                     insuranceBet = Convert.ToDouble(Console.ReadLine());
                     if (insuranceBet <= 0) //if bet not greater than 0
                         Console.WriteLine("Enter a bet greater than 0");
-                    else if (insuranceBet > (bet / 2)) //if bet larger than half the original bet
+                    else if (insuranceBet > (bet / 2.0)) //if bet larger than half the original bet
                         Console.WriteLine("Insurance bet too large. Enter a bet at most half your original bet.");
                     else //if bet was good, break from the loop
                         succ = true;
@@ -105,6 +105,59 @@ namespace Blackjack
         public void hit(Card c) //hit me! add one card to player's hand
         {
             hand.Add(c);
+        }
+
+        public void playHand() //plays a hand for a player starting with the two cards dealt
+        {
+            Console.WriteLine("{0}'s turn", name);
+            getHand();
+            int valOfHand = getHandVal();
+            Console.WriteLine("Value of hand: {0}", valOfHand.ToString());
+            bool stand = false;
+            bool hasBusted = false;
+            if (blackjack == false)
+            {
+                do
+                {
+                    Console.WriteLine("1 for hit, 0 for stand");
+                    string input = Console.ReadLine();
+                    if (input == "1")
+                    {
+                        hit(MainClass.drawCard());
+                        Console.WriteLine("You receive a {0}", hand[hand.Count - 1].id);
+                        Console.WriteLine("Value of hand: {0}", getHandVal().ToString());
+                        if (getHandVal() == 21) //auto stand on 21 by breaking from the loop
+                            break;
+                    }
+                    else if (input == "0")
+                    {
+                        stand = true;
+                        Console.WriteLine("{0} stood at {1}", name, getHandVal().ToString());
+                        Console.WriteLine();
+                    }
+
+
+                    hasBusted = bustedHand();
+                    if (hasBusted)
+                    {
+                        Console.WriteLine("{0} has busted", name);
+                        busted = true;
+                    }
+
+
+                } while (stand == false && hasBusted == false); //breaks when player stands or busts
+                Thread.Sleep(1000);
+            }
+            else
+                Console.WriteLine("{0} won with blackjack!", name);
+        }
+
+        public bool bustedHand() //returns true if a hand is a bust
+        {
+            if (getHandVal() > 21)
+                return true;
+            else
+                return false;
         }
 
         public void emptyHand() //prepares hands for the next round
