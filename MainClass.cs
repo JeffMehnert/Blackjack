@@ -70,12 +70,12 @@ namespace Blackjack
                 Console.WriteLine();
                 
                 Card dealerTopCard = dealer.getTopCard(); //print out dealer top card              
-                /*if(dealerTopCard.id == "A") //if dealer shows ace, offer insurance
+                if (dealerTopCard.id == "A") //if dealer shows ace, offer insurance
                 {
                     foreach (Player p in players)
                         p.insurance();
                 }
-            */
+
                 Console.WriteLine();
 
                 if (dealer.getHandVal() == 21) //check if dealer has blackjack
@@ -84,7 +84,12 @@ namespace Blackjack
                     dealer.blackjack = true;
                     foreach (Player p in players)
                     {
-                        if (p.blackjack == false)
+                        if(p.insuranceBet > 0)
+                        {
+                            p.bank += p.insuranceBet * 2;
+                            Console.WriteLine("{0} won their insurance bet");
+                        }
+                        else if (p.blackjack == false)
                             Console.WriteLine("Dealer wins over {0}", p.name);
                         else
                             Console.WriteLine("{0} pushes", p.name);
@@ -146,7 +151,15 @@ namespace Blackjack
 
                 Console.WriteLine("You played with {0} decks, {1} cards left in the deck", deckCount, deck.cards.Count);
                 Console.WriteLine("Would you like to play another hand? 1 for yes, 0 for no");
-                int input = Convert.ToInt32(Console.ReadLine());
+                bool succ = false;
+                int input;
+                do
+                {
+                    input = Convert.ToInt32(Console.ReadLine());
+                    if (input == 0 || input == 1)
+                        succ = true;
+                } while (succ == false);
+                
                 if (input == 0) //done playing
                     done = true;
 

@@ -14,8 +14,9 @@ namespace Blackjack
         public List<Card> hand; //player's hand
         public bool busted;
         public bool blackjack;
-        public double bank;
-        public int bet;
+        public double bank; //total amount of money player has at table
+        public double bet; //amount player bets on current hand
+        public double insuranceBet; //amount player bets on insurance if applicable
 
         public Player(string name) //constructor
         {
@@ -25,6 +26,7 @@ namespace Blackjack
             blackjack = false;
             bank = 0;
             bet = 0;
+            insuranceBet = 0;
         }
 
         public void addMoney()
@@ -66,7 +68,7 @@ namespace Blackjack
                 bank += bet * 2;
         }
 
-        public void insurance()
+        public void insurance() //when dealer shows an A, player has option to take insurance
         {
             Console.WriteLine("Dealer is showing an A. {0}, would you like to buy insurance? 1 for yes, 0 for no.");
             bool success = false;
@@ -77,14 +79,28 @@ namespace Blackjack
                 if (input == 0 || input == 1)
                     success = true;
             } while (success == false);
-            if (input == 1)
+            
+            if (input == 1) //if they want to take insurance
             {
+                Console.WriteLine("How much would you like to bet for insurance? Bet can be up to half the amount of your original bet.");
+                bool succ = false;
+                do
+                {
+                    insuranceBet = Convert.ToDouble(Console.ReadLine());
+                    if (insuranceBet <= 0) //if bet not greater than 0
+                        Console.WriteLine("Enter a bet greater than 0");
+                    else if (insuranceBet > (bet / 2)) //if bet larger than half the original bet
+                        Console.WriteLine("Insurance bet too large. Enter a bet at most half your original bet.");
+                    else //if bet was good, break from the loop
+                        succ = true;
+                } while (succ == false);
 
+                Console.WriteLine("Insurance bet placed for {0}", name);
+                bank -= insuranceBet;
             }
-            else
+            else //if they don't want insurance
                 return;
         }
-
 
         public void hit(Card c) //hit me! add one card to player's hand
         {
@@ -97,6 +113,7 @@ namespace Blackjack
             busted = false;
             blackjack = false;
             bet = 0;
+            insuranceBet = 0;
         }
 
         public void getHand() //prints hand's contents
