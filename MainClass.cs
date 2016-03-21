@@ -6,6 +6,7 @@ March 2016
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Diagnostics;
 
 namespace Blackjack
 {
@@ -16,6 +17,8 @@ namespace Blackjack
 
         public static void Main()
         {
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
             Console.WriteLine("Welcome to Jeff's blackjack!");
             Console.WriteLine("How many decks would you like to play with?");
             int deckCount = Convert.ToInt32(Console.ReadLine()); //amount of decks (2 deck, 6 deck, etc)
@@ -157,7 +160,6 @@ namespace Blackjack
                     break;
                 }
 
-
                 Console.WriteLine("You are playing with {0} decks, {1} cards left in the deck", deckCount, deck.cards.Count);
                 Console.WriteLine("Would you like to play another hand? 1 for yes, 0 for no");
                 bool succ = false;
@@ -177,6 +179,10 @@ namespace Blackjack
 
                 dealer.emptyHand();
             } while (done == false);
+            watch.Stop();
+            var elapsedTime = TimeSpan.FromMilliseconds(watch.ElapsedMilliseconds);
+            var formattedTime = string.Format("Elapsed time playing: {0} hours, {1} minutes, {2} seconds.", elapsedTime.Hours, elapsedTime.Minutes, elapsedTime.Seconds);
+            Console.WriteLine(formattedTime);
             Console.WriteLine("Thanks for playing! Press any key to exit. Made by jeffymeh");
             Console.ReadKey();
         }
